@@ -15,6 +15,7 @@ public class ReportModel : LabPageModel
         ("js_dialog_prompt", "JS prompt()"),
         ("js2", "Extended JavaScript capabilities"),
         ("encoding", "Character encoding"),
+        ("compression", "HTTP compression (gzip/deflate)"),
         ("ssr", "Small-screen reflow"),
         ("frames", "Frames"),
         ("qr_image", "QR code (image)"),

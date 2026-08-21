@@ -1,0 +1,36 @@
+@page "/test/compression"
+@model OperaLegacyLab.Web.Pages.Test.CompressionModel
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+<h1>HTTP compression test</h1>
+<p>Two separate things, often lumped together as one "does it support
+compression?" question: whether your browser <b>asks</b> for a compressed
+response at all (the <tt>Accept-Encoding</tt> request header - the only
+"compression" a browser itself ever sends; browsers this old have no way to
+compress a request body), and whether it can actually <b>decompress</b> one
+if the server sends it regardless.</p>
+
+<p><tt>Accept-Encoding</tt> header this browser just sent: <tt>@(string.IsNullOrEmpty(Model.AcceptEncoding) ? "(not sent)" : Model.AcceptEncoding)</tt><br>
+<tt>TE</tt> header: <tt>@(string.IsNullOrEmpty(Model.Te) ? "(not sent)" : Model.Te)</tt></p>
+
+<p>The three links below each ignore whatever Accept-Encoding said above and
+force a compressed response anyway, specifically to find out what the
+browser can really handle rather than only what it claims to. Each should
+show one readable sentence if decompression worked, or garbled text, a
+download prompt, or nothing at all if it didn't:</p>
+<ul>
+<li><a href="@Markup.U("/test/compression/gzip", code)">gzip</a> - the one
+virtually every modern server and browser agrees on</li>
+<li><a href="@Markup.U("/test/compression/deflate", code)">deflate
+(zlib-wrapped)</a> - what HTTP's "deflate" Content-Encoding token is
+actually supposed to mean per RFC 2616</li>
+<li><a href="@Markup.U("/test/compression/deflate-raw", code)">deflate
+(raw)</a> - what a lot of real servers sent instead, historically, under the
+same "deflate" name - a well-known interop mixup from that era, included in
+case the zlib-wrapped one above fails but this one doesn't</li>
+</ul>
+
+@Html.Raw(SelfReport.Form(code,
+    "Which of the three above showed readable text - gzip, deflate (zlib), deflate (raw), some combination, or none? Note anything unusual (download prompt, blank page, garbled text)."))
