@@ -1,0 +1,18 @@
+@page "/test/encoding"
+@model OperaLegacyLab.Web.Pages.Test.EncodingModel
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+<h1>Character encoding test</h1>
+<p>Old mobile browsers frequently only supported ISO-8859-1 (Latin-1),
+while modern servers default to UTF-8. Open both variants below and see
+which one actually displays the accented characters, currency signs and
+smart quotes correctly rather than as boxes, question marks, or garbage
+bytes.</p>
+<ul>
+<li><a href="/test/encoding/utf8?lab=@code">View UTF-8 encoded version</a></li>
+<li><a href="/test/encoding/latin1?lab=@code">View ISO-8859-1 encoded version</a></li>
+</ul>
+@Html.Raw(SelfReport.Form(code,
+    "Which version(s) displayed the special characters correctly - UTF-8, ISO-8859-1, both, or neither?"))

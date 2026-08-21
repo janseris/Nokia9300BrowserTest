@@ -1,0 +1,143 @@
+@page "/test/css2"
+@model OperaLegacyLab.Web.Pages.Test.Css2Model
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+<link rel="stylesheet" type="text/css" href="/css/extended-test.css">
+<style type="text/css">
+.floatbox { float: left; width: 80px; height: 50px; background-color: #ffe0b0; border: 1px solid #a06000; margin-right: 8px; }
+.clearer { clear: both; }
+.posrelative { position: relative; width: 200px; height: 70px; border: 1px solid #666; }
+.posabsolute { position: absolute; top: 15px; left: 40px; width: 120px; background-color: #ffffcc; border: 1px solid #999; padding: 4px; }
+.zbox1 { position: absolute; top: 0; left: 0; width: 100px; height: 60px; background-color: #ffb3b3; z-index: 1; }
+.zbox2 { position: absolute; top: 20px; left: 40px; width: 100px; height: 60px; background-color: #b3d9ff; z-index: 2; }
+.zwrap { position: relative; height: 90px; }
+a.hovertest:link, a.hovertest:visited { color: #0000cc; text-decoration: underline; }
+a.hovertest:hover { color: #cc0000; background-color: #ffffcc; }
+.hoverspan:hover { color: #cc0000; }
+.bgimg { width: 140px; height: 60px; background-image: url(/img/test.png); background-repeat: repeat; border: 1px solid #333; }
+.roundbutton {
+    display: inline-block;
+    padding: 8px 16px;
+    background-color: #3d7dca;
+    color: #ffffff;
+    border: 1px solid #2a5a96;
+    border-radius: 8px;
+    box-shadow: 2px 2px 6px #888888;
+    font-weight: bold;
+    text-decoration: none;
+}
+.roundbutton:hover { background-color: #ffa500; color: #000000; }
+.decotest { text-decoration: underline; text-transform: uppercase; letter-spacing: 3px; }
+.listsquare { list-style-type: square; }
+.listimg { list-style-image: url(/img/test.gif); }
+.overflowhidden { width: 120px; height: 40px; overflow: hidden; border: 1px solid #333; }
+.overflowscroll { width: 120px; height: 40px; overflow: scroll; border: 1px solid #333; }
+#uniqueid { color: #006600; }
+.specwrap p.specclass { color: #0000cc; }
+.specwrap #uniqueid.specclass { color: #cc00cc; font-weight: bold; }
+.importanttest { color: #0000cc !important; }
+.unitpx { font-size: 12px; }
+.unitem { font-size: 1.4em; }
+.unitpct { font-size: 150%; }
+table.csstable { border-collapse: collapse; }
+table.csstable td { border: 1px solid #666; padding: 4px; background-color: #eef; }
+</style>
+
+<h1>Extended CSS capability test</h1>
+<p>This goes well beyond the basic CSS support test - floats, positioning,
+:hover, background images, rounded corners/shadows, and more. Opera 6 is a
+2001-era browser, so several of these (especially [5], rounded corners and
+shadows) are expected to fail outright - that expected failure is itself a
+useful, concrete answer, so please report exactly what you see rather than
+what "should" happen.</p>
+
+<h2>[1] Float + clear</h2>
+<div class="floatbox">Floated box</div>
+<p>This text should wrap around the right side of the orange floated box to
+its left, rather than starting below it.</p>
+<div class="clearer"></div>
+
+<h2>[2] Positioning: relative + absolute</h2>
+<div class="posrelative">
+Relative-positioned outer box.
+<div class="posabsolute">Absolutely-positioned child, offset from the outer box's top-left corner.</div>
+</div>
+
+<h2>[2b] Layering (z-index)</h2>
+<div class="zwrap">
+<div class="zbox1">Box 1 (z-index 1)</div>
+<div class="zbox2">Box 2 (z-index 2, should overlap on top of Box 1)</div>
+</div>
+
+<h2>[3] :hover pseudo-class</h2>
+<p><a class="hovertest" href="/test/css2?lab=@code">This link should turn red with a pale yellow background when hovered/focused</a> (a plain link - :hover on links has the widest support).</p>
+<p><span class="hoverspan">This plain (non-link) text should turn red when hovered</span> - :hover on ordinary elements is a much newer, less universally supported feature than :hover on links.</p>
+<p><i>Note: if this device has no pointer/touch/mouse, there may be no way to
+trigger :hover at all regardless of what the browser supports - that's a
+device limitation, not necessarily a CSS one, and is worth noting if so.</i></p>
+
+<h2>[4] Background image</h2>
+<div class="bgimg">This box's background should be tiled with a small test image.</div>
+
+<h2>[5] Rounded corners + shadow + hover color change</h2>
+<p><a class="roundbutton" href="/test/css2?lab=@code">Styled button</a></p>
+<p>This should be a blue button with rounded corners and a drop shadow behind
+it, turning orange when hovered/focused. <code>border-radius</code> and
+<code>box-shadow</code> are CSS3 properties that didn't exist as web
+standards until years after Opera 6 - expect a plain rectangular button with
+no shadow and no color change here.</p>
+
+<h2>[6] Text decoration / transform / spacing</h2>
+<p class="decotest">This text should be underlined, forced to uppercase, and have extra letter spacing.</p>
+
+<h2>[7] List styling</h2>
+<ul class="listsquare">
+<li>This bullet should be a square, not the default disc</li>
+<li>Second item</li>
+</ul>
+<ul class="listimg">
+<li>This bullet should be the small test GIF image instead of a normal bullet</li>
+</ul>
+
+<h2>[8] Overflow</h2>
+<p>Hidden (content past the box edge should be clipped, not shown, and no scrollbar):</p>
+<div class="overflowhidden">This box has a lot more text in it than its fixed 120x40 size can show all at once.</div>
+<p>Scroll (should show a scrollbar so the same overflowing content can be scrolled into view):</p>
+<div class="overflowscroll">This box has a lot more text in it than its fixed 120x40 size can show all at once.</div>
+
+<h2>[9] display:none vs visibility:hidden</h2>
+<p>Before -&gt;</p>
+<p style="display:none;">This paragraph has display:none - if that's honored, this line should not appear at all AND should take up no vertical space.</p>
+<p style="visibility:hidden;">This paragraph has visibility:hidden - if that's honored, this line should be invisible but its blank space should still be reserved.</p>
+<p>&lt;- After (if there's a visible gap above this line, visibility:hidden reserved its space as expected; if the gap is bigger or smaller than expected, note that).</p>
+
+<h2>[10] Selector specificity</h2>
+<div class="specwrap">
+<p id="uniqueid" class="specclass">This text's color is decided by three CSS rules of different specificity (element, class, and ID+class combined) - if specificity is honored, it should end up magenta and bold, not blue.</p>
+</div>
+
+<h2>[11] Externally linked stylesheet</h2>
+<div class="external-box">This box is styled entirely from a separate .css file loaded via
+&lt;link rel="stylesheet"&gt; in the page's &lt;head&gt;, not an inline
+&lt;style&gt; block like every other test on this page - it should have a
+pale green background and a dark green border if external stylesheets work.</div>
+
+<h2>[12] !important</h2>
+<p class="importanttest" style="color: #cc0000;">This text has both an inline style (red) and a stylesheet rule marked !important (blue) - if !important is honored, this should be blue despite the inline style.</p>
+
+<h2>[13] CSS units + table styling</h2>
+<p class="unitpx">This line is 12px.</p>
+<p class="unitem">This line is 1.4em (should be noticeably larger than the 12px line above).</p>
+<p class="unitpct">This line is 150% (should also be larger than normal body text).</p>
+<table class="csstable" cellpadding="0" cellspacing="0">
+<tr><td>Cell A</td><td>Cell B</td></tr>
+<tr><td>Cell C</td><td>Cell D</td></tr>
+</table>
+<p>Table borders should look like a single collapsed grid (border-collapse),
+with each cell shaded pale blue from a CSS class rather than an HTML
+<code>bgcolor</code> attribute.</p>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Overall, how much of the extended CSS above rendered as described - floats, positioning, hover, rounded/shadowed button, lists, overflow, external stylesheet, !important, units, table?"))

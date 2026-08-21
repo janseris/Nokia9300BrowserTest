@@ -1,0 +1,10 @@
+/* Used only by /test/css2, item [11] - proves an externally *linked*
+   stylesheet (<link rel="stylesheet">) works, as distinct from every other
+   CSS test in this app, which all use an inline <style> block or a style=""
+   attribute instead. A browser can easily support one and not the other. */
+.external-box {
+    background-color: #ddffdd;
+    border: 2px solid #006600;
+    padding: 6px;
+    font-family: monospace;
+}

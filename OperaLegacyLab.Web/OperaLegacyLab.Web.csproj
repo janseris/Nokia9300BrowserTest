@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- QRCoder's core encoder is vendored under Vendor/QRCoder (see the README.md there for why:
+       no NuGet PackageReference, just its dependency-free source files) rather than referenced
+       as a PackageReference - no ItemGroup needed here, the .cs files under Vendor/ are picked up
+       automatically like any other file in an SDK-style project. -->
+
+</Project>

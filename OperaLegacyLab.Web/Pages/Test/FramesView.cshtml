@@ -1,0 +1,19 @@
+@page "/test/frames/view"
+@model OperaLegacyLab.Web.Pages.Test.FramesViewModel
+@{
+    Layout = null;
+}
+@* A <frameset> document has no <body>, so this bypasses the shared _Layout entirely. *@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head><title>Frames test</title></head>
+<frameset cols="35%,65%">
+<frame src="@Model.NavUrl" name="navframe">
+<frame src="@Model.ContentUrl" name="contentframe">
+<noframes>
+<body>
+<p>Your browser does not render frames (this is the &lt;noframes&gt; fallback).</p>
+</body>
+</noframes>
+</frameset>
+</html>

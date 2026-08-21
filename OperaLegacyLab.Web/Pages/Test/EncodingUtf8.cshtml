@@ -1,0 +1,12 @@
+@page "/test/encoding/utf8"
+@model OperaLegacyLab.Web.Pages.Test.EncodingUtf8Model
+<h1>UTF-8 encoded sample</h1>
+<p>Content-Type header sent: <tt>text/html; charset=utf-8</tt></p>
+@* Html.Raw is essential here, not cosmetic: Razor's default HtmlEncoder
+   numeric-entity-escapes non-ASCII characters (e.g. writes "&#233;" instead
+   of the literal two-byte UTF-8 sequence for e-acute). That would make this
+   page pass even on a browser with no real multi-byte UTF-8 decoding -
+   ancient browsers resolve numeric character references just fine on their
+   own. The sample text is a hardcoded constant with no HTML metacharacters,
+   so bypassing encoding here carries no injection risk. *@
+<p>@Html.Raw(OperaLegacyLab.Web.Pages.Test.EncodingUtf8Model.SampleText)</p>

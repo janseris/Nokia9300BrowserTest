@@ -1,0 +1,14 @@
+@page "/test/qr-table"
+@model OperaLegacyLab.Web.Pages.Test.QrTableModel
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+@section Head {
+<meta http-equiv="refresh" content="@Model.SecondsRemaining">
+}
+@Html.Raw(Model.TableHtml)
+<p><font size="1">HTML table (@Model.TableSizePx x @Model.TableSizePx px), not an image, sent without compression. Code @Model.Code, refreshes automatically (meta refresh) every 15s. <a href="@Markup.U("/test/qr-image", code)">Image version</a></font></p>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Did the table above look like a correct, square, scannable QR code, or was it stretched? Did it change on its own every ~15s?"))

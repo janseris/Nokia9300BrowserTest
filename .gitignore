@@ -1,0 +1,7 @@
+bin/
+obj/
+.vs/
+*.user
+certs/
+device-results.txt
+device-results.state.json

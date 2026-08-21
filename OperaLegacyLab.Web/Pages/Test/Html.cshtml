@@ -1,0 +1,53 @@
+@page "/test/html"
+@model OperaLegacyLab.Web.Pages.Test.HtmlModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>HTML rendering test</h1>
+<p>This page uses only HTML 4.01 markup: headings, a nested table, lists,
+&lt;font&gt; tags, horizontal rules, and three images in different formats
+(GIF, PNG, JPEG). Tell us at the bottom what you actually see.</p>
+
+<h2>Text formatting</h2>
+<p><b>Bold</b>, <i>italic</i>, <u>underline</u>,
+<font color="red">red text</font>,
+<font size="+2">bigger text</font>,
+<tt>teletype/monospace</tt>, sub<sub>script</sub> and super<sup>script</sup>.</p>
+
+<h2>Lists</h2>
+<ul>
+<li>Unordered item one
+<li>Unordered item two
+  <ol>
+  <li>Nested ordered item
+  <li>Another nested item
+  </ol>
+</ul>
+
+<h2>Table (with a nested table inside one cell)</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Column A</th><th>Column B</th></tr>
+<tr>
+  <td>Plain cell</td>
+  <td>
+    <table border="1" cellpadding="2" cellspacing="0">
+    <tr><td>nested</td><td>table</td></tr>
+    </table>
+  </td>
+</tr>
+</table>
+
+<h2>Images</h2>
+<p>
+GIF: <img src="/img/test.gif" width="32" height="32" alt="[gif]"><br>
+PNG: <img src="/img/test.png" width="48" height="32" alt="[png]"><br>
+JPEG: <img src="/img/test.jpg" width="48" height="32" alt="[jpg]">
+</p>
+
+<h2>Character entities</h2>
+<p>Copyright &copy;, ampersand &amp;, less-than &lt;, non-breaking&nbsp;space,
+euro sign &euro;, em dash &mdash;.</p>
+
+<h2>Horizontal rule</h2>
+<hr>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Did the headings, table, lists, font styling and all three images (GIF, PNG, JPEG) display correctly?"))

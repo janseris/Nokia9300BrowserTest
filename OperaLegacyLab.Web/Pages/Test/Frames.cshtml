@@ -1,0 +1,12 @@
+@page "/test/frames"
+@model OperaLegacyLab.Web.Pages.Test.FramesModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>Frames test</h1>
+<p>Classic HTML 4.01 frameset with two frames: a narrow navigation frame on
+the left and a content frame on the right. The nav frame has a link that
+targets (replaces) the content frame - this tests both basic frame rendering
+and cross-frame link targeting.</p>
+<p><a href="@Markup.U("/test/frames/view", Model.Lab.Code)">Open the frameset</a></p>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Did you see two separate frames, and did clicking the nav-frame link change only the content frame (not the whole page)?"))

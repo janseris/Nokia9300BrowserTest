@@ -1,0 +1,115 @@
+@page "/test/js2"
+@model OperaLegacyLab.Web.Pages.Test.Js2Model
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+<h1>Extended JavaScript capability test</h1>
+<p>Beyond the [1]-[14] basics: language features that arrived slightly later
+(ECMAScript 3, ~1999) and things this app itself might rely on if it used
+more dynamic JavaScript - DOM element lookup, deferred execution, and
+whether AJAX-era APIs exist at all. Each item is its own independent
+&lt;script&gt; block, same as the first JS test, so one failing test can't
+hide the ones before or after it.</p>
+
+<script type="text/javascript">
+document.write('<p>[1] switch statement: ');
+var n = 2, sw = 'unmatched';
+switch (n) {
+  case 1: sw = 'one'; break;
+  case 2: sw = 'two'; break;
+  default: sw = 'other';
+}
+document.write(sw + '</p>');
+</script>
+
+<script type="text/javascript">
+var obj = { a: 1, b: 2, c: 3 };
+var keys = '';
+for (var k in obj) { keys = keys + k + '=' + obj[k] + ' '; }
+document.write('<p>[2] for-in loop over object properties: ' + keys + '</p>');
+</script>
+
+<script type="text/javascript">
+var arr = [3, 1, 4, 1, 5];
+arr.push(9);
+arr.sort();
+document.write('<p>[3] Array methods (push/sort/reverse/join): ' + arr.reverse().join(',') + '</p>');
+</script>
+
+<script type="text/javascript">
+var s = 'one,two,three';
+var parts = s.split(',');
+document.write('<p>[4] String methods (split/indexOf/substring/replace): split -> ' + parts.join('|') +
+  ', indexOf("two") = ' + s.indexOf('two') +
+  ', replace -> ' + s.replace('two', 'TWO') + '</p>');
+</script>
+
+<script type="text/javascript">
+function makeCounter() {
+  var count = 0;
+  return function () { count = count + 1; return count; };
+}
+var counter = makeCounter();
+counter(); counter();
+document.write('<p>[5] Closures: counter() called twice more = ' + counter() + ' (should be 3, proving the inner function kept its own private "count")</p>');
+</script>
+
+<script type="text/javascript">
+function sumAll() {
+  var total = 0;
+  for (var i = 0; i < arguments.length; i++) { total = total + arguments[i]; }
+  return total;
+}
+document.write('<p>[6] arguments object: sumAll(1,2,3,4) = ' + sumAll(1, 2, 3, 4) + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[7] typeof operator: number=' + (typeof 1) + ', string=' + (typeof 'x') +
+  ', boolean=' + (typeof true) + ', function=' + (typeof sumAll) +
+  ', undefined-var=' + (typeof someNameThatWasNeverDeclared) + '</p>');
+</script>
+
+<script type="text/javascript">
+var ternary = (5 > 3) ? 'yes' : 'no';
+document.write('<p>[8] Conditional (ternary) operator: (5 &gt; 3) ? "yes" : "no" = ' + ternary + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[9] Strict equality (===, ECMAScript 3): (1 === 1) = ' + (1 === 1) + ', (1 === "1") = ' + (1 === '1') + '</p>');
+</script>
+
+<script type="text/javascript">
+var domApi = 'none found';
+if (document.getElementById) { domApi = 'document.getElementById'; }
+else if (document.all) { domApi = 'document.all'; }
+else if (document.layers) { domApi = 'document.layers (Netscape 4 style)'; }
+document.write('<p>[10] DOM element-lookup API available: ' + domApi + '</p>');
+</script>
+
+<p>[11] Deferred execution + DOM update: <span id="timeoutTarget">(waiting for setTimeout...)</span></p>
+<script type="text/javascript">
+function setHtmlById(id, html) {
+  if (document.getElementById) { document.getElementById(id).innerHTML = html; return true; }
+  if (document.all) { document.all(id).innerHTML = html; return true; }
+  return false;
+}
+window.setTimeout(function () {
+  var ok = setHtmlById('timeoutTarget', 'setTimeout + DOM update worked (this text was written back 1.5s after the page loaded).');
+  if (!ok) { setHtmlById('timeoutTarget', '(no DOM API available to update this text, though setTimeout itself may still have fired)'); }
+}, 1500);
+</script>
+
+<h2>[12] window.open (popup)</h2>
+<p><input type="button" value="Try window.open()" onclick="window.open('/test/js2?lab=@code', 'popupwin', 'width=200,height=150');"> - report whether anything happened at all (a new window/tab, nothing visible, or an error).</p>
+
+<script type="text/javascript">
+document.write('<p>[13] JSON support (added to browsers around 2005+, expected ABSENT here): typeof JSON = ' + (typeof JSON) + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[14] XMLHttpRequest / AJAX support (also expected ABSENT on a browser this old): typeof XMLHttpRequest = ' + (typeof XMLHttpRequest) + '</p>');
+</script>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Overall, how much of [1]-[14] above worked as described? Note which numbers failed or looked wrong, and whether [11]'s text updated after ~1.5s and whether [12]'s button did anything."))

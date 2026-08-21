@@ -1,0 +1,27 @@
+@page "/uaprof"
+@model OperaLegacyLab.Web.Pages.UaProfModel
+<h1>WAP UAProf</h1>
+@if (string.IsNullOrEmpty(Model.Lab.WapProfileUrl))
+{
+    <p>This browser has not sent an <code>X-Wap-Profile</code> header, so there
+    is no UAProf document to fetch. Many WAP-era phones sent this header pointing
+    at an XML/RDF document describing their exact capabilities (screen size,
+    supported markup, image formats, JavaScript support and more) - if the Nokia
+    9300's Opera does send one, it will show up here automatically.</p>
+}
+else
+{
+    <p>Profile URL advertised by the browser: <code>@Model.Lab.WapProfileUrl</code></p>
+    <p>Fetch result: @Model.Lab.WapProfileFetchStatus</p>
+    <p>Note: this URL is normally hosted by the handset or browser vendor. Twenty-plus
+    years on it may well be gone, in which case a fetch failure here is itself the
+    answer, not a bug.</p>
+    @if (Model.Lab.WapProfileSnippet is null)
+    {
+        <p><i>No content retrieved.</i></p>
+    }
+    else
+    {
+        <pre>@Model.Lab.WapProfileSnippet</pre>
+    }
+}

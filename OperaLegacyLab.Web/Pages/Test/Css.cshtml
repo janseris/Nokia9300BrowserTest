@@ -1,0 +1,33 @@
+@page "/test/css"
+@model OperaLegacyLab.Web.Pages.Test.CssModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>CSS support test</h1>
+<p>This checks CSS1-level styling through two independent mechanisms.
+Note which of the two boxes below actually looks styled.</p>
+
+<style type="text/css">
+.boxA { background-color: #ffff99; border: 2px solid #000080; padding: 6px; font-family: monospace; }
+.boxA .redtext { color: #cc0000; font-weight: bold; }
+</style>
+
+<h2>Mechanism 1: &lt;style&gt; block + class selector</h2>
+<div class="boxA">
+This box should have a pale yellow background, a navy border, and
+monospace text. <span class="redtext">This part should be red and bold.</span>
+</div>
+
+<h2>Mechanism 2: inline style="" attribute</h2>
+<div style="background-color:#cceeff; border: 2px dashed #cc0000; padding: 6px;">
+This box should have a pale blue background and a red dashed border,
+set entirely with an inline <code>style</code> attribute
+(no &lt;style&gt; block involved).
+</div>
+
+<h2>Text-level CSS</h2>
+<p style="font-size: 20px; text-align: center;">This line should be centered
+and noticeably larger than normal text (font-size: 20px, text-align: center).</p>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Which, if any, of the boxes above showed the described styling (colors/borders/fonts)?"))
+
+<p><a href="@Markup.U("/test/css2", Model.Lab.Code)">Continue to more CSS tests (floats, positioning, hover, rounded corners/shadows) -&gt;</a></p>

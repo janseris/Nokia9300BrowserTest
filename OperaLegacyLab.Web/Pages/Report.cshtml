@@ -1,0 +1,40 @@
+@page "/report"
+@model OperaLegacyLab.Web.Pages.ReportModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>Report</h1>
+<p>Session @Model.Lab.Code, started @Model.Lab.CreatedUtc.ToString("u") UTC, last seen @Model.Lab.LastSeenUtc.ToString("u") UTC.</p>
+
+<h2>Server-verified (authoritative) results</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Test</th><th>Result</th></tr>
+<tr><td>User-Agent</td><td>@Model.Lab.LastUserAgent</td></tr>
+<tr><td>HTTP protocol</td><td>@Model.Lab.LastProtocol</td></tr>
+<tr><td>Cookie round-trip</td><td>@Model.CookieResultText</td></tr>
+<tr><td>Form POST</td><td>@Model.FormResultText</td></tr>
+<tr><td>WML rendering (self-confirmed via WAP card links)</td><td>@(Model.Lab.WmlResult ?? "(not yet tested)")</td></tr>
+<tr><td>WAP UAProf</td><td>@Model.UaProfSummary</td></tr>
+</table>
+
+@if (Model.Lab.FormPosted)
+{
+    <h3>Form fields received</h3>
+    <table border="1" cellpadding="4" cellspacing="0">
+    <tr><th>Field</th><th>Value</th></tr>
+    @foreach (var kv in Model.Lab.FormPostedValues)
+    {
+        <tr><td>@kv.Key</td><td>@kv.Value</td></tr>
+    }
+    </table>
+}
+
+<h2>Self-reported (visual) results</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Test</th><th>Result</th><th>Notes</th></tr>
+@foreach (var t in OperaLegacyLab.Web.Pages.ReportModel.SelfReportTests)
+{
+    <tr><td>@t.Label</td><td>@Model.SelfReportResult(t.Key)</td><td>@Model.SelfReportNote(t.Key)</td></tr>
+}
+</table>
+
+<p><a href="@Markup.U("/report/text", Model.Lab.Code)">Plain-text version (for copying/saving)</a></p>
+<p><a href="@Markup.U("/diagnostics", Model.Lab.Code)">Full raw header dump</a></p>

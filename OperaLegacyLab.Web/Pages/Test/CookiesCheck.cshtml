@@ -1,0 +1,17 @@
+@page "/test/cookies/check"
+@model OperaLegacyLab.Web.Pages.Test.CookiesCheckModel
+<h1>Cookie support test - result</h1>
+@if (Model.Present)
+{
+    <p><b>Cookies work.</b> The server set a cookie on the previous request and
+    your browser sent it straight back on this one.</p>
+}
+else
+{
+    <p><b>Cookies do NOT appear to work</b> (or this specific browser instance has
+    them disabled). The server set a cookie on the previous request, but it did not
+    come back. This is exactly why every link on this site also carries the session
+    code in the URL as a fallback.</p>
+}
+<p>Raw Cookie header this browser sent just now:<br>
+<tt>@Model.RawCookieHeader</tt></p>

@@ -1,0 +1,10 @@
+@page "/test/wap"
+@model OperaLegacyLab.Web.Pages.Test.WapModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>WAP / WML test</h1>
+<p>The Accept header your browser sent on this page: <tt>@Model.Accept</tt></p>
+<p>Advertises WML support in Accept: <b>@(Model.AdvertisesWml ? "yes" : "no")</b></p>
+<p><a href="@Markup.U("/test/wap.wml", Model.Lab.Code)">Open a small WML 1.3 card</a></p>
+<p>If Opera renders it as a proper WAP card (with its own navigation, not a
+wall of raw XML tags), WML rendering works inside the same browser. If you
+see the raw markup or a download prompt, it does not.</p>

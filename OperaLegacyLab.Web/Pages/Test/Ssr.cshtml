@@ -1,0 +1,25 @@
+@page "/test/ssr"
+@model OperaLegacyLab.Web.Pages.Test.SsrModel
+@using OperaLegacyLab.Web.Infrastructure
+<h1>Small-Screen / wide layout rendering test</h1>
+<p>Opera's "Small Screen Rendering" (SSR) reflows wide content to fit a
+narrow screen instead of forcing horizontal scrolling. This page is built
+deliberately wide to see whether that kicks in.</p>
+
+<h2>Fixed-width table (1000px)</h2>
+<table border="1" width="1000" cellpadding="4" cellspacing="0">
+<tr><td width="500">Left cell, fixed 500px</td><td width="500">Right cell, fixed 500px</td></tr>
+</table>
+
+<h2>Wide image</h2>
+<img src="/img/test.png" width="600" height="400" alt="wide image">
+
+<h2>Long unbreakable token (no spaces)</h2>
+<p style="font-family: monospace;">@Model.LongToken</p>
+
+<p>Questions to consider: did you have to scroll sideways to read the table
+or the long token, or did the page rearrange itself to fit the screen width
+with no horizontal scrolling at all?</p>
+
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Did this page reflow to fit your screen (no sideways scrolling needed), or did you have to scroll horizontally?"))

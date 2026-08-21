@@ -1,0 +1,50 @@
+@page "/"
+@model OperaLegacyLab.Web.Pages.IndexModel
+@{
+    var code = Model.Lab.Code;
+}
+<h1>Opera Legacy Lab</h1>
+<p>
+This is a small test kit for finding out exactly what a very old mobile
+browser can do - written for the Opera 6.x browser built into the
+Nokia 9300 (Symbian S80), but it will happily probe any browser you point
+at it, old or new.
+</p>
+<p>
+Known starting point for Opera 6.x on the 9300: HTML 4.01, XHTML, JavaScript 1.3,
+WML 1.3, TLS 1.2 (via a device-side patch), and Opera's "Small Screen Rendering"
+reflow. Everything below tries to find out more than that.
+</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><td><b>Your User-Agent string</b></td><td>@(Model.Lab.LastUserAgent ?? "(not sent)")</td></tr>
+<tr><td><b>Lab session code</b></td><td>@code</td></tr>
+<tr><td><b>Scheme this request used</b></td><td>@(Model.IsHttps ? "https" : "http")</td></tr>
+</table>
+
+<p>
+If a link stops carrying you between pages correctly (the session code above
+keeps changing every time you come back here), your browser likely does not
+support cookies - that's fine, every link on this site also carries the code
+directly, so nothing here depends on cookies working.
+</p>
+
+<h2>Tests</h2>
+<ol>
+<li><a href="/diagnostics?lab=@code">HTTP request &amp; header diagnostics</a></li>
+<li><a href="/test/html?lab=@code">HTML rendering test</a></li>
+<li><a href="/test/css?lab=@code">CSS support test</a></li>
+<li><a href="/test/css2?lab=@code">Extended CSS capability test</a></li>
+<li><a href="/test/js?lab=@code">JavaScript capability test</a></li>
+<li><a href="/test/js2?lab=@code">Extended JavaScript capability test</a></li>
+<li><a href="/test/forms?lab=@code">Form controls test</a></li>
+<li><a href="/test/cookies?lab=@code">Cookie support test</a></li>
+<li><a href="/test/encoding?lab=@code">Character encoding test</a></li>
+<li><a href="/test/ssr?lab=@code">Small-screen / wide layout rendering test</a></li>
+<li><a href="/test/frames?lab=@code">Frames test</a></li>
+<li><a href="/test/qr-image?lab=@code">QR code (image) test</a></li>
+<li><a href="/test/qr-table?lab=@code">QR code (HTML table) test</a></li>
+<li><a href="/test/wap?lab=@code">WAP / WML test</a></li>
+</ol>
+
+<p><a href="/report?lab=@code">View the report so far</a></p>

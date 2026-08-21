@@ -1,0 +1,5 @@
+@page "/test/js/dialogresult"
+@model OperaLegacyLab.Web.Pages.Test.JsDialogResultModel
+<h1>Dialog test recorded</h1>
+<p>Recorded <b>@(Model.DialogType)()</b> as: <b>@Model.Recorded</b></p>
+<p><a href="/test/js?lab=@Model.Lab.Code">Back to the JavaScript test (run another dialog)</a></p>

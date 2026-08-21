@@ -1,0 +1,53 @@
+@page "/diagnostics"
+@model OperaLegacyLab.Web.Pages.DiagnosticsModel
+@{
+    var code = Model.Lab.Code;
+}
+<h1>HTTP request &amp; header diagnostics</h1>
+<p>This is exactly what your browser sent on its most recent request here -
+the single most reliable source of truth about what it is and what it claims
+to support.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><td><b>Method</b></td><td>@Model.Lab.LastMethod</td></tr>
+<tr><td><b>Protocol</b></td><td>@Model.Lab.LastProtocol</td></tr>
+<tr><td><b>Remote address</b></td><td>@Model.Lab.LastRemoteIp</td></tr>
+<tr><td><b>User-Agent</b></td><td>@Model.Lab.LastUserAgent</td></tr>
+@{
+    // ctx.Request.IsHttps is true either because ngrok's own edge-to-phone
+    // connection was https (reported to us via X-Forwarded-Proto) or because
+    // ngrok's agent connected to this app's own local HTTPS listener -
+    // either way, the real TLS connection with the phone was terminated by
+    // ngrok's edge, so its exact protocol version/cipher suite isn't visible
+    // from inside this app, only that it was https.
+}
+@if (Request.IsHttps)
+{
+    <tr><td><b>Scheme</b></td><td>https</td></tr>
+}
+else
+{
+    <tr><td><b>Scheme</b></td><td>http (no TLS)</td></tr>
+}
+@if (Model.HasUaProf)
+{
+    <tr><td><i>X-Wap-Profile</i></td><td>@Model.UaProfUrl - <a href="/uaprof?lab=@code">fetch it</a></td></tr>
+}
+else
+{
+    <tr><td><i>X-Wap-Profile</i></td><td>not sent by this browser</td></tr>
+}
+</table>
+
+<h2>All request headers</h2>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Header</th><th>Value</th></tr>
+@foreach (var h in Model.Lab.LastHeaders)
+{
+    <tr><td>@h.Name</td><td>@h.Value</td></tr>
+}
+</table>
+
+<p>Look especially at <b>Accept</b> (what content types/markup it claims to
+render), <b>Accept-Charset</b> (character encodings), <b>Accept-Language</b>,
+and <b>Accept-Encoding</b> (whether it can accept gzip-compressed responses).</p>

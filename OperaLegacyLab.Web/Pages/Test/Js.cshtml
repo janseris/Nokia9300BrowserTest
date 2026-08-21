@@ -1,0 +1,137 @@
+@page "/test/js"
+@model OperaLegacyLab.Web.Pages.Test.JsModel
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+    var dlg = Markup.U("/test/js/dialogresult", code);
+}
+<h1>JavaScript capability test</h1>
+<p>Every result below is produced live by <code>document.write</code> while the
+page loads, one independent &lt;script&gt; block per feature and numbered [1]
+through [14]. Whatever you actually see on screen - not what this paragraph
+says - is the real answer, so read to the bottom and report what appeared.</p>
+
+<noscript>
+<p><b>[JavaScript did NOT run - this line only appears when scripting is
+disabled or unsupported.]</b></p>
+</noscript>
+
+<script type="text/javascript">
+document.write('<p><b>[1] JavaScript DID run - document.write works.</b></p>');
+</script>
+
+<script type="text/javascript">
+var a = 6, b = 7;
+document.write('<p>[2] Arithmetic: 6 * 7 = ' + (a*b) + '</p>');
+</script>
+
+<script type="text/javascript">
+var arr = [1,2,3,4,5];
+var sum = 0;
+for (var i = 0; i < arr.length; i++) { sum = sum + arr[i]; }
+document.write('<p>[3] Arrays + for-loop: sum of [1,2,3,4,5] = ' + sum + '</p>');
+</script>
+
+<script type="text/javascript">
+function square(x) { return x*x; }
+document.write('<p>[4] Function definition/call: square(9) = ' + square(9) + '</p>');
+</script>
+
+<script type="text/javascript">
+var s = "Hello Opera";
+document.write('<p>[5] String methods: "' + s + '".toUpperCase() = ' + s.toUpperCase() + ', length = ' + s.length + '</p>');
+</script>
+
+<script type="text/javascript">
+var d = new Date(2004, 0, 1);
+document.write('<p>[6] Date object: new Date(2004,0,1).getFullYear() = ' + d.getFullYear() + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[7] Math object: Math.sqrt(2) = ' + Math.sqrt(2) + '</p>');
+</script>
+
+<script type="text/javascript">
+var re = /op(\w+)ra/i;
+var m = "Opera Browser".match(re);
+document.write('<p>[8] Regular expressions: match of /op(\w+)ra/i on "Opera Browser" = ' + (m ? m[0] : 'NO MATCH') + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[9] navigator object: appName=' + navigator.appName + ', appVersion=' + navigator.appVersion + '</p>');
+document.write('<p>[9b] navigator.userAgent = ' + navigator.userAgent + '</p>');
+</script>
+
+<script type="text/javascript">
+var w = 'unavailable', h = 'unavailable';
+if (typeof screen != 'undefined') { w = screen.width; h = screen.height; }
+document.write('<p>[10] screen object: width x height = ' + w + ' x ' + h + '</p>');
+</script>
+
+<script type="text/javascript">
+document.cookie = "jscookie=1; path=/";
+document.write('<p>[11] document.cookie after setting one: ' + document.cookie + '</p>');
+</script>
+
+<script type="text/javascript">
+document.write('<p>[12] About to test try/catch (JS1.4+ / ECMAScript 3) -&gt;</p>');
+</script>
+
+<script type="text/javascript">
+try {
+  throw "boom";
+} catch (e) {
+  document.write('<p>[12b] try/catch IS supported - caught: ' + e + '</p>');
+}
+</script>
+
+<h2>[13] Event handlers + DOM0 form access</h2>
+<form name="jsform">
+<input type="button" value="Click me" onclick="document.jsform.out.value='Clicked! Event handlers + DOM0 form access work.';">
+<input type="text" name="out" size="42" value="(not clicked yet)">
+</form>
+
+<h2>[14] Image rollover (document.images, mouseover/mouseout)</h2>
+<p>
+<img src="/img/test.gif" name="rollimg" width="32" height="32"
+     onmouseover="document.images['rollimg'].src='/img/test.png';"
+     onmouseout="document.images['rollimg'].src='/img/test.gif';">
+</p>
+<p>(If your device has no pointer/touch, note that instead of a result.)</p>
+
+<hr>
+<h2>[15]-[17] Blocking dialogs: alert / confirm / prompt</h2>
+<p><b>Try these three buttons now, before the summary form below</b> - once
+you submit that form it takes you straight to the report page and you won't
+come back here. Each button below triggers one dialog; the result is
+recorded automatically as soon as you respond to it (no separate submit
+needed). These can hang some old mobile browsers with no clean way to
+dismiss the dialog - if that happens here, you may need to restart the
+device, but everything above is already recorded either way.</p>
+
+<p>[15] <input type="button" value="Run alert() test" onclick="alert('If you can read this and press OK, alert() works. This will now record success automatically.'); location.href='@dlg&type=alert&ok=1';"></p>
+
+<p>[16] <input type="button" value="Run confirm() test" onclick="if (confirm('Press OK or Cancel - either answer is recorded.')) { location.href='@dlg&type=confirm&ok=1'; } else { location.href='@dlg&type=confirm&ok=0'; }"></p>
+
+<p>[17] <input type="button" value="Run prompt() test" onclick="var p = prompt('Type anything and press OK, or press Cancel.'); if (p !== null) { location.href='@dlg&type=prompt&ok=1&value=' + escape(p); } else { location.href='@dlg&type=prompt&ok=0'; }"></p>
+
+<p><i>(prompt's result is captured with the older <code>escape()</code>
+function rather than <code>encodeURIComponent</code>, since escape() has
+existed since the very earliest JavaScript versions and is more likely to be
+present on a JS1.3-era engine.)</i></p>
+
+<hr>
+<form method="post">
+<p><b>Overall: did tests [1] through [14] mostly work?</b></p>
+<p>
+<input type="radio" name="result" value="yes" checked> Yes - most/all numbered lines appeared<br>
+<input type="radio" name="result" value="partial"> Partly - some lines appeared, some didn't<br>
+<input type="radio" name="result" value="no"> No - [1] itself never appeared
+</p>
+<p>Which numbered lines actually appeared, and did [13]/[14] work? (free text):<br>
+<textarea name="note" rows="4" cols="40"></textarea></p>
+<input type="hidden" name="lab" value="@code">
+<p><input type="submit" value="Submit result for [1]-[14]"></p>
+</form>
+
+<p><a href="@Markup.U("/test/js2", code)">Continue to more JavaScript tests -&gt;</a></p>

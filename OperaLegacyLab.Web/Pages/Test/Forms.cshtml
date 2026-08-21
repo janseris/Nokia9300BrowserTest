@@ -1,0 +1,76 @@
+@page "/test/forms"
+@model OperaLegacyLab.Web.Pages.Test.FormsModel
+@if (!Model.Submitted)
+{
+    <h1>Form controls test</h1>
+    <p>Unlike the other tests, this one is fully authoritative: whatever the
+    server actually receives when you press Submit is shown back to you on the
+    next page, no self-reporting needed.</p>
+
+    <form method="post">
+    <table border="0" cellpadding="3">
+    <tr><td>Text field:</td>
+        <td><input type="text" name="text_field" value="edit me" size="30"></td></tr>
+    <tr><td>Password field:</td>
+        <td><input type="password" name="pw_field" size="30"></td></tr>
+    <tr><td>Textarea:</td>
+        <td><textarea name="textarea_field" rows="3" cols="30">multi
+line
+default text</textarea></td></tr>
+    <tr><td>Checkbox:</td>
+        <td><input type="checkbox" name="checkbox_field" value="checked_value" checked></td></tr>
+    <tr><td>Radio group:</td>
+        <td>
+        <input type="radio" name="radio_field" value="one"> One
+        <input type="radio" name="radio_field" value="two" checked> Two
+        <input type="radio" name="radio_field" value="three"> Three
+        </td></tr>
+    <tr><td>Select (single):</td>
+        <td>
+        <select name="select_field">
+        <option value="alpha">Alpha</option>
+        <option value="bravo" selected>Bravo</option>
+        <option value="charlie">Charlie</option>
+        </select>
+        </td></tr>
+    <tr><td>Select (multiple):</td>
+        <td>
+        <select name="multi_field" multiple size="3">
+        <option value="red" selected>Red</option>
+        <option value="green">Green</option>
+        <option value="blue" selected>Blue</option>
+        </select>
+        </td></tr>
+    <tr><td>Hidden field:</td>
+        <td>(not shown - <input type="hidden" name="hidden_field" value="hidden_value_123">)</td></tr>
+    </table>
+    <input type="hidden" name="lab" value="@Model.Lab.Code">
+    <p>
+    <input type="submit" name="submit_btn" value="Submit form">
+    <input type="reset" value="Reset form">
+    </p>
+    </form>
+}
+else
+{
+    <h1>Form submission received</h1>
+    <p>The server received an HTTP POST with the following fields and values
+    exactly as your browser sent them:</p>
+    <table border="1" cellpadding="4" cellspacing="0">
+    <tr><th>Field name</th><th>Value received</th></tr>
+    @foreach (var kv in Model.PostedValues)
+    {
+        <tr><td>@kv.Key</td><td>@kv.Value</td></tr>
+    }
+    </table>
+    @if (!Model.CheckboxKeyPresent)
+    {
+        <p><i>Note: the checkbox key is entirely absent above - that's normal HTML
+        behavior for an unchecked box, not a bug, but if you left it checked and it's
+        still missing, that's worth reporting.</i></p>
+    }
+    <p>If a field above is missing, blank, or wrong compared to what you set on
+    the form, that tells you something concrete about this browser's form
+    support (a multiple-select box and a textarea with embedded newlines are the
+    two most commonly mishandled controls on old browsers).</p>
+}

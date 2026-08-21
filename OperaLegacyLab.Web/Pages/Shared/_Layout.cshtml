@@ -1,0 +1,24 @@
+@{
+    // This IS the top-level HTML document - deliberately no further nesting,
+    // no CSS, no JS, no tag helpers/bundling. Every page's own markup becomes
+    // @RenderBody() below; only the shared doctype/head/body chrome and the
+    // nav/session-code footer live here, exactly like the old Html.Page()
+    // helper did, just as an actual Razor layout instead of a string builder.
+    var labCode = ViewData["LabCode"] as string ?? "";
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>@ViewData["Title"]</title>
+@RenderSection("Head", required: false)
+</head>
+<body>
+@RenderBody()
+<hr>
+<p>
+<a href="/?lab=@labCode">Home</a> |
+<a href="/report?lab=@labCode">View report</a>
+</p>
+<p><font size="1">Lab session: @labCode</font></p>
+</body>
+</html>
