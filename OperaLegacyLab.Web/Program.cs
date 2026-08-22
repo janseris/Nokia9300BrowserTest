@@ -82,6 +82,13 @@ app.UseForwardedHeaders(forwardedHeaderOptions);
 // ngrok's own https to the phone, not redirect behavior on this local hop.
 app.UseStaticFiles();
 
+// Buffers every response and, only for pages using the shared _Layout.cshtml, prepends a real
+// page-size/compression report and (unlike anywhere else in this app) actually compresses the
+// response when this request's own Accept-Encoding asked for gzip - see PageSizeReportMiddleware's
+// own doc comment for why this is safe for the pages that deliberately bypass the shared layout for
+// byte-exact testing (EncodingLatin1, WapWml, ReportText, /test/qr-png, every /test/compression/*).
+app.UseMiddleware<PageSizeReportMiddleware>();
+
 // Every route in this app - home page, every test, diagnostics, the report -
 // is a Razor Page under Pages/, routed by convention/@page directive. This
 // one call replaces what used to be a dozen separate app.MapXxxEndpoints()
