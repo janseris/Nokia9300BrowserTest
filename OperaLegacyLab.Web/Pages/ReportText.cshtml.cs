@@ -24,6 +24,10 @@ public class ReportTextModel : LabPageModel
         sb.AppendLine("User-Agent: " + Lab.LastUserAgent);
         sb.AppendLine("HTTP protocol: " + Lab.LastProtocol);
         sb.AppendLine("Cookie round-trip: " + (Lab.CookieRoundTripPassed?.ToString() ?? "not tested"));
+        sb.AppendLine("Cookie round-trip (HttpOnly+Secure+SameSite=Strict): " + (Lab.SecureCookieRoundTripPassed?.ToString() ?? "not tested"));
+        sb.AppendLine("  - Secure actually enforced: " + (Lab.SecureCookieSeenOverPlainHttp is null ? "not tested" : (!Lab.SecureCookieSeenOverPlainHttp.Value).ToString()));
+        sb.AppendLine("  - HttpOnly actually enforced: " + (Lab.HttpOnlyVisibleToJs is null ? "not tested" : (!Lab.HttpOnlyVisibleToJs.Value).ToString()));
+        sb.AppendLine("  - SameSite=Strict actually enforced: not tested (needs a genuine cross-site request; this lab is single-origin)");
         sb.AppendLine("Form POST: " + (Lab.FormPosted ? "submitted" : "not submitted"));
         if (Lab.FormPosted)
             foreach (var kv in Lab.FormPostedValues)

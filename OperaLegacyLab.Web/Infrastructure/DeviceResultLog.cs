@@ -45,6 +45,7 @@ public sealed class DeviceResultLog
         "js_dialog_alert", "js_dialog_confirm", "js_dialog_prompt", "js2",
         "encoding", "compression", "ssr", "frames", "qr_image", "qr_table",
         "cookies", "forms", "wml", "uaprof",
+        "cookies_secure",
     };
 
     private readonly string _filePath;

@@ -39,6 +39,29 @@ public class ReportModel : LabPageModel
         null => "(not yet tested)",
     };
 
+    public string SecureCookieResultText => Lab.SecureCookieRoundTripPassed switch
+    {
+        true => "pass - HttpOnly+Secure+SameSite=Strict cookie round-tripped",
+        false => "fail - cookie did not come back",
+        null => "(not yet tested)",
+    };
+
+    // These two are the actual enforcement checks, not just the round-trip above - see
+    // CookieSecureCheck.cshtml.cs's own doc comment for exactly how each is obtained.
+    public string SecureEnforcedText => Lab.SecureCookieSeenOverPlainHttp switch
+    {
+        false => "enforced - cookie was withheld over plain http",
+        true => "NOT enforced - cookie came back even over plain http",
+        null => "(not tested - no plain-http follow-up attempted, or none reachable)",
+    };
+
+    public string HttpOnlyEnforcedText => Lab.HttpOnlyVisibleToJs switch
+    {
+        false when Lab.SecureCookieRoundTripPassed == true => "enforced - hidden from document.cookie",
+        true => "NOT enforced - visible in document.cookie",
+        _ => "(not tested - JavaScript never reported a result, or the cookie never arrived)",
+    };
+
     public string FormResultText => Lab.FormPosted
         ? "submitted - see field values below"
         : "(not yet submitted)";

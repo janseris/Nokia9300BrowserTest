@@ -20,3 +20,8 @@ Reported features from Nokia 9300 technical and product documentation:
   - does not check certificates
   - no planned support for TLS 1.3
 - multiple windows
+
+Info from tests:
+- cookie HttpOnly doesn't work - Javascript could read this cookie
+- cookie SameSite=Strict no (introduced in 2016 to prevent CSRF attacks, can be fixed using CSRF tokens probably)
+- cookie Secure OK - the cookie is only used in HTTPS and is not sent back if connecting to HTTP

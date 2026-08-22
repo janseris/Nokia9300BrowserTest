@@ -7,13 +7,17 @@ using System.Security.Cryptography.X509Certificates;
 namespace OperaLegacyLab.Web.Infrastructure;
 
 /// <summary>
-/// Generates (and caches to disk) a self-signed RSA certificate for the app's
-/// local HTTPS listener. This exists purely so ngrok's agent has an HTTPS
-/// backend to connect to (`ngrok http https://localhost:5443`) - ngrok does
-/// not verify this certificate by default (it assumes the agent's local
-/// network is trusted), so nothing further needs to be configured for that to
-/// work. This is a throwaway test certificate; nothing about it should be
-/// reused anywhere else.
+/// RETIRED - no longer referenced by Program.cs, safe to delete this file (and any old
+/// certs/lab-cert.pfx next to it, already gitignored either way).
+///
+/// This used to generate a one-off self-signed RSA certificate for the app's local HTTPS listener.
+/// That worked fine for ngrok, which doesn't verify the origin certificate by default, but a
+/// certificate-verifying tunnel client (Cloudflare Tunnel/cloudflared does verify, by default) will
+/// always reject an unfamiliar self-signed cert like this one - there's no CA chain or trust-store entry
+/// backing it. Program.cs now instead points its HTTPS listener at the standard ASP.NET Core HTTPS
+/// DEVELOPMENT certificate via a bare `listenOptions.UseHttps()` (no certificate argument), which
+/// `dotnet dev-certs https --trust` (run once, locally) can actually add to the OS trust store - fixing
+/// exactly the "certificate isn't trusted" problem this class's approach ran into with cloudflared.
 /// </summary>
 public static class DevCertificate
 {

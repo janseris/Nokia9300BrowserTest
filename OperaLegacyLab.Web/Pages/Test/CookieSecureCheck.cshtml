@@ -1,0 +1,108 @@
+@page "/test/cookie-secure/check"
+@model OperaLegacyLab.Web.Pages.Test.CookieSecureCheckModel
+<h1>Secure/HttpOnly/SameSite cookie test - result</h1>
+<p>The previous page tried to set a cookie with three attributes at once:
+<tt>HttpOnly</tt>, <tt>Secure</tt>, and <tt>SameSite=Strict</tt> - all newer
+than Opera 6.x itself (<tt>SameSite</tt> especially; it didn't exist as a
+concept until 2016). The basic check below only proves the cookie's value
+survived one round trip - see the two follow-up checks further down for
+whether Secure/HttpOnly are actually being enforced, not just tolerated.</p>
+
+@if (!Model.RequestWasHttps)
+{
+    <p><b>Note:</b> this request did not arrive over https.</p>
+}
+@if (Model.Present)
+{
+    <p><b>Cookie works.</b> The server set this cookie (with HttpOnly, Secure,
+    and SameSite=Strict all set) on the previous request, and your browser
+    sent it straight back on this one.</p>
+}
+else
+{
+    <p><b>Cookie did NOT come back.</b> Either this browser doesn't support
+    one or more of HttpOnly/Secure/SameSite well enough to still accept and
+    store the cookie, or this simply wasn't reached over a secure connection.</p>
+}
+<p>Raw Cookie header this browser sent just now:<br>
+<tt>@Model.RawCookieHeader</tt></p>
+
+<h2>Is Secure actually enforced?</h2>
+<p>The check above only shows the cookie survived an https round trip - that
+alone doesn't prove anything about Secure, since it would look identical
+whether or not this browser enforces it. The real test: does the SAME
+cookie also come back over a plain http connection to this same address?
+If it does, Secure isn't being enforced; if it's genuinely missing there,
+it is.</p>
+@if (Model.Lab.SecureCookieSeenOverPlainHttp.HasValue)
+{
+    if (Model.Lab.SecureCookieSeenOverPlainHttp.Value)
+    {
+        <p><b>Secure is NOT enforced</b> - the cookie came back even over plain http.</p>
+    }
+    else
+    {
+        <p><b>Secure IS enforced</b> - the cookie was correctly withheld over plain http.</p>
+    }
+}
+else if (Model.RequestWasHttps)
+{
+    <p><a href="@Model.PlainHttpCheckUrl">Click here to try loading this same check page over plain http</a>
+    to find out. (This link only works at all if your ngrok tunnel happens to expose this same address
+    over plain http as well as https - on the real device, reached only through ngrok's https tunnel,
+    it may simply fail to load at all. That failure is itself a real, useful answer: it just means this
+    particular check can't be run from here, not that Secure is broken.)</p>
+}
+else
+{
+    <p>(Not tested yet - not applicable from a plain-http visit; start from the https version of this test.)</p>
+}
+
+<h2>Is HttpOnly actually enforced?</h2>
+<p>HttpOnly's entire point is hiding a cookie from JavaScript's own
+<tt>document.cookie</tt> - the only way to check it is to actually ask
+JavaScript, which the script below does automatically (no click needed,
+using the exact same document.write technique as the JavaScript capability
+tests elsewhere in this lab).</p>
+@if (Model.Lab.HttpOnlyVisibleToJs.HasValue)
+{
+    if (Model.Lab.HttpOnlyVisibleToJs.Value)
+    {
+        <p><b>HttpOnly is NOT enforced</b> - JavaScript's document.cookie could see this cookie.</p>
+    }
+    else if (Model.Present)
+    {
+        <p><b>HttpOnly IS enforced</b> - the cookie arrived in the raw request header above, but
+        JavaScript's document.cookie could NOT see it.</p>
+    }
+    else
+    {
+        <p>JavaScript ran and reported the cookie wasn't visible to it - but the cookie didn't arrive at
+        all on this request either (see above), so this doesn't actually demonstrate HttpOnly working,
+        just that there was nothing there either way.</p>
+    }
+}
+else
+{
+    <p>(Not yet determined - either JavaScript hasn't run on this page yet, or this browser doesn't run
+    JavaScript at all, in which case this specific check can never be completed here.)</p>
+}
+@if (!Model.HttpOnlyAlreadyProbed)
+{
+    <script type="text/javascript">
+    var cookieVisibleToJs = (document.cookie.indexOf('cookietest_secure') >= 0);
+    document.write('<form name="httpOnlyProbe" method="post" action="/test/cookie-secure/check?lab=@Model.Lab.Code">');
+    document.write('<input type="hidden" name="httpOnlyVisible" value="' + (cookieVisibleToJs ? '1' : '0') + '">');
+    document.write('</form>');
+    document.httpOnlyProbe.submit();
+    </script>
+}
+
+<h2>What about SameSite=Strict?</h2>
+<p>Deliberately not tested by this lab. <tt>SameSite</tt> only ever matters
+for a request that originates from a genuinely different site than this
+cookie's own origin - every request this lab can make or ask you to make is
+same-origin navigation, so there is no way to give <tt>SameSite=Strict</tt>
+a chance to actually block anything from here. Confirming it for real would
+need a link hosted on a separate, different domain, which this single-origin
+lab doesn't have.</p>

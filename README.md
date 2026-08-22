@@ -58,19 +58,33 @@ It's carried both as a cookie **and** as a `?lab=CODE` query parameter on
 every link, because WAP-era phone browsers had unreliable cookie support -
 if cookies don't work, navigation and the report still work via the URL.
 
-The phone can't reach this app over the LAN, so the only access path is an
-ngrok tunnel connecting to this app's own local HTTPS listener
-(`ngrok http https://localhost:5443`). ngrok terminates the real TLS
+The phone can't reach this app over the LAN, so the only access path is a
+public tunnel (ngrok, Cloudflare Tunnel/cloudflared, or similar) pointed at
+one of this app's two local listeners. The tunnel terminates the real TLS
 connection with the phone at its own public edge, then makes a *separate*
-local HTTPS connection to this app to forward the request - that local hop
-is what the app's HTTPS listener and self-signed certificate are for. ngrok
-does not verify that certificate by default (it assumes the agent's local
-network is trusted), so nothing extra needs configuring for it to work. The
-app also trusts ngrok's `X-Forwarded-Proto`/`X-Forwarded-For` headers (via
-`ForwardedHeadersOptions`) so `/diagnostics` reports the phone's real IP
-address rather than ngrok's local one. Both listeners are HTTP/1.1 only, and
-Kestrel's minimum-data-rate timeouts are relaxed, since a phone on a slow
-mobile link can be much slower than Kestrel's defaults expect.
+local connection to this app to forward the request - which local listener
+that connection targets depends on the tunnel:
+- **Plain http (default `5000`)**: the simplest setup, and both ngrok's and
+  cloudflared's own quickstarts default to exactly this - the tunnel
+  decrypts its own public HTTPS at its edge and forwards plain HTTP
+  locally. No certificate is involved on this hop at all, and it's equally
+  secure from the phone's point of view either way.
+- **HTTPS (default `5253`)**: only needed if you specifically want the
+  tunnel-to-Kestrel hop itself encrypted/verified too. This listener serves
+  the standard ASP.NET Core HTTPS **development** certificate (the one
+  `dotnet dev-certs https` manages), not a one-off self-signed certificate -
+  ngrok doesn't verify the origin certificate by default so it connects to
+  either listener happily, but cloudflared *does* verify by default, so it
+  will only accept this listener once you've run `dotnet dev-certs https
+  --trust` once, locally (this adds the certificate to your OS's normal
+  trust store).
+
+The app also trusts the tunnel's `X-Forwarded-Proto`/`X-Forwarded-For`
+headers (via `ForwardedHeadersOptions`) so `/diagnostics` reports the
+phone's real IP address rather than the tunnel daemon's local one. Both
+listeners are HTTP/1.1 only, and Kestrel's minimum-data-rate timeouts are
+relaxed, since a phone on a slow mobile link can be much slower than
+Kestrel's defaults expect.
 
 Alert/confirm/prompt dialogs are tested too (at your explicit request), even
 though a hung dialog can leave an old mobile browser unresponsive with no
@@ -92,41 +106,52 @@ cd OperaLegacyLab.Web
 dotnet run
 ```
 
-By default it listens on `http://0.0.0.0:5000` **and** `https://0.0.0.0:5443`
-(change with `dotnet run --LabPort=8080 --LabHttpsPort=8443`). The first run
-generates a self-signed certificate at
-`OperaLegacyLab.Web/certs/lab-cert.pfx` (gitignored) and reuses it after
-that - delete the file to force regeneration.
+By default it listens on `http://0.0.0.0:5000` **and** `https://0.0.0.0:5253`
+(change with `dotnet run --LabPort=8080 --LabHttpsPort=8443`). The HTTPS
+listener uses the standard ASP.NET Core HTTPS development certificate - if
+you've never run it before, `dotnet dev-certs https` (no arguments) creates
+one; add `--trust` to also add it to your OS's trust store, which matters
+only if your tunnel client verifies the origin certificate (see below).
 
-## Testing through ngrok
+## Testing through a tunnel (ngrok / Cloudflare Tunnel / similar)
 
 1. Start the app (`dotnet run`, or F5 in Visual Studio).
-2. In another terminal: `ngrok http https://localhost:5443` (swap the port
-   if you changed `LabHttpsPort`). ngrok should connect straight away - no
-   flag is needed to accept the self-signed certificate, since ngrok doesn't
-   verify the local backend's certificate by default.
-3. Open the `https://something.ngrok-free.app` URL ngrok gives you in an
-   ordinary desktop browser first, to confirm the tunnel itself works before
-   involving the phone.
+2. In another terminal, start your tunnel pointed at whichever local listener
+   it can reach:
+   - ngrok, https origin: `ngrok http https://localhost:5253` - connects
+     straight away, no extra flag needed, since ngrok doesn't verify the
+     origin certificate by default.
+   - cloudflared (Cloudflare Tunnel), http origin - the simplest option,
+     and the one to reach for first if you hit a certificate-trust error:
+     `cloudflared tunnel --url http://localhost:5000`.
+   - cloudflared, https origin - only if you want this hop encrypted too:
+     run `dotnet dev-certs https --trust` once first, then
+     `cloudflared tunnel --url https://localhost:5253`. Without the
+     `--trust` step first, cloudflared will reject the certificate as
+     untrusted - that's the same failure a self-signed certificate would
+     produce, and is exactly what the `--trust` step fixes.
+3. Open the public URL the tunnel gives you in an ordinary desktop browser
+   first, to confirm the tunnel itself works before involving the phone.
 4. A couple of things worth knowing about this path specifically:
-   - **ngrok's free tier shows an interstitial "you are about to visit..."
-     warning page** before proxying through to the real site. That page is
-     modern HTML/CSS/JS - there's a real chance the 9300's Opera can't
-     render or click through it at all, which would block access regardless
-     of anything this app does. If the phone can't get past that page, that's
-     ngrok's warning page, not a capability this app is testing.
+   - **Some tunnel providers show an interstitial warning page** (ngrok's
+     free tier does: "you are about to visit...") before proxying through to
+     the real site. That page is modern HTML/CSS/JS - there's a real chance
+     the 9300's Opera can't render or click through it at all, which would
+     block access regardless of anything this app does. If the phone can't
+     get past that page, that's the tunnel provider's warning page, not a
+     capability this app is testing.
    - Once the tunnel is up, the URL is effectively public for as long as it
      stays open - anyone with the link can reach it. There's nothing
      sensitive behind it (just self-reported browser test results), but
      it's worth closing the tunnel when you're done.
-5. On the phone, go to the ngrok HTTPS URL. Work through the numbered tests
-   from the home page. If a "lab session code" keeps changing every time you
-   go back to the home page, that's itself useful information - it means
-   cookies aren't working.
+5. On the phone, go to the tunnel's public HTTPS URL. Work through the
+   numbered tests from the home page. If a "lab session code" keeps changing
+   every time you go back to the home page, that's itself useful information
+   - it means cookies aren't working.
 6. Check `/report` (or `/report/text`) at any point to see everything
    gathered so far. Since the phone can't easily save a file, note down the
    6-character session code shown at the bottom of every page - you can open
-   the same report later from a desktop browser at the same ngrok URL plus
+   the same report later from a desktop browser at the same tunnel URL plus
    `/report?lab=<CODE>` (while the tunnel is still up).
 
 ## Project layout
@@ -145,7 +170,7 @@ OperaLegacyLab.Web/
     LabPageModel.cs                Shared PageModel base: resolves the lab session, carries [IgnoreAntiforgeryToken]
     Markup.cs                      Small helpers: HTML-escaping, "?lab=" URL builder
     SelfReport.cs                  Shared "did this look right?" self-post form
-    DevCertificate.cs              Self-signed cert for ngrok's local HTTPS backend connection
+    DevCertificate.cs              RETIRED, unused - safe to delete (see its own doc comment)
   Pages/
     _ViewStart.cshtml              Wires every page to Shared/_Layout.cshtml
     Shared/_Layout.cshtml          Page chrome: HTML 4.01 doctype, nav links, no CSS
@@ -175,7 +200,6 @@ OperaLegacyLab.Web/
       WapWml.cshtml                 /test/wap.wml                     the actual WML 1.3 card (Content() bypass)
       WapResult.cshtml              /test/wap/result                  records the WML yes/no reply
   wwwroot/img/                     test.gif / test.png / test.jpg
-  certs/                           generated self-signed cert (gitignored)
 ```
 
 Two things worth knowing if you're extending this:
@@ -200,10 +224,11 @@ Two things worth knowing if you're extending this:
 ## Notes and known limitations
 
 - TLS specifics of the *phone's* connection (protocol version, cipher suite)
-  aren't visible from inside this app - ngrok terminates that connection at
-  its own public edge, then makes a separate local connection to this app to
-  forward the request. `/diagnostics` shows that the request arrived as
-  https, which is the confirmation available from this side.
+  aren't visible from inside this app - whichever tunnel is in front (ngrok,
+  cloudflared, or similar) terminates that connection at its own public
+  edge, then makes a separate local connection to this app to forward the
+  request. `/diagnostics` shows that the request arrived as https, which is
+  the confirmation available from this side.
 - The WAP UAProf fetch reaches out to whatever URL the phone's
   `X-Wap-Profile` header advertises. That's usually hosted by the handset or
   browser vendor - it may well be offline after 20+ years, in which case a

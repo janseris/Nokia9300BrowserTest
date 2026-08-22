@@ -30,6 +30,33 @@ public sealed class LabSession
 
     // Authoritative round-trip tests (server verifies directly, no self-report).
     public bool? CookieRoundTripPassed { get; set; }
+
+    // Independent of CookieRoundTripPassed above: that test's cookie has no HttpOnly/Secure/SameSite
+    // attributes at all (the simplest possible case). This one specifically checks whether a cookie
+    // set with HttpOnly=true, Secure=true, SameSite=Strict - all attributes that postdate Opera 6.x
+    // by many years (SameSite in particular is a 2016+ addition) - still round-trips, since a browser
+    // that doesn't recognize an attribute could reasonably ignore it (harmless) or could choke on the
+    // whole Set-Cookie header (not harmless) - either is a real, useful answer.
+    public bool? SecureCookieRoundTripPassed { get; set; }
+
+    // Two more direct, targeted follow-ups - SecureCookieRoundTripPassed above only proves the cookie
+    // survived ONE https round trip, which is not the same as proving Secure/HttpOnly/SameSite are
+    // actually being enforced. See CookieSecureCheck.cshtml.cs's own doc comment for exactly how each
+    // is obtained and what it does/doesn't prove.
+    //
+    // Did the SAME cookie also come back on a later, deliberate plain-http (no TLS) visit to the same
+    // check page? true = it did (Secure is NOT being enforced - a real gap); false = it didn't (Secure
+    // IS being enforced correctly); null = that follow-up was never attempted (e.g. no plain-http path
+    // to this host exists through whichever tunnel is in front of this app, or the visitor never
+    // clicked the link).
+    public bool? SecureCookieSeenOverPlainHttp { get; set; }
+
+    // Did client-side JavaScript's own document.cookie see this cookie at all? true = yes (HttpOnly is
+    // NOT being enforced); false = no, even though the cookie did arrive in the raw request header
+    // (HttpOnly IS working); null = never determined (no JS ran at all, or the cookie never arrived in
+    // the first place so there's nothing meaningful to conclude from document.cookie either way).
+    public bool? HttpOnlyVisibleToJs { get; set; }
+
     public bool FormPosted { get; set; }
     public Dictionary<string, string> FormPostedValues { get; set; } = new();
     public string? WmlRequestAccept { get; set; }

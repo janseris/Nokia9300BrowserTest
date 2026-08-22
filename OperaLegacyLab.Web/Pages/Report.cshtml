@@ -10,6 +10,10 @@
 <tr><td>User-Agent</td><td>@Model.Lab.LastUserAgent</td></tr>
 <tr><td>HTTP protocol</td><td>@Model.Lab.LastProtocol</td></tr>
 <tr><td>Cookie round-trip</td><td>@Model.CookieResultText</td></tr>
+<tr><td>Cookie round-trip (HttpOnly+Secure+SameSite=Strict)</td><td>@Model.SecureCookieResultText</td></tr>
+<tr><td>&nbsp;&nbsp;&#8226; Secure actually enforced?</td><td>@Model.SecureEnforcedText</td></tr>
+<tr><td>&nbsp;&nbsp;&#8226; HttpOnly actually enforced?</td><td>@Model.HttpOnlyEnforcedText</td></tr>
+<tr><td>&nbsp;&nbsp;&#8226; SameSite=Strict actually enforced?</td><td>not tested (needs a genuine cross-site request; this lab is single-origin)</td></tr>
 <tr><td>Form POST</td><td>@Model.FormResultText</td></tr>
 <tr><td>WML rendering (self-confirmed via WAP card links)</td><td>@(Model.Lab.WmlResult ?? "(not yet tested)")</td></tr>
 <tr><td>WAP UAProf</td><td>@Model.UaProfSummary</td></tr>
