@@ -20,6 +20,7 @@ public class ReportModel : LabPageModel
         ("frames", "Frames"),
         ("qr_image", "QR code (image)"),
         ("qr_table", "QR code (HTML table)"),
+        ("table_variants", "Table cell sizing variants"),
     };
 
     public ReportModel(LabSessionStore store) : base(store) { }

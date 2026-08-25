@@ -144,10 +144,16 @@ only if your tunnel client verifies the origin certificate (see below).
      stays open - anyone with the link can reach it. There's nothing
      sensitive behind it (just self-reported browser test results), but
      it's worth closing the tunnel when you're done.
-5. On the phone, go to the tunnel's public HTTPS URL. Work through the
-   numbered tests from the home page. If a "lab session code" keeps changing
-   every time you go back to the home page, that's itself useful information
-   - it means cookies aren't working.
+5. On the phone, go to the tunnel's public URL plus `/OK` first. It should
+   return nothing but the two bytes "OK" - no HTML, no cookie, no layout.
+   This is deliberately the least the app could possibly send, so if the
+   browser hangs at "Loading..." even on this, the fault is below the app
+   (the tunnel, TLS, the network path itself) rather than anything Opera
+   Legacy Lab renders. Once that works, go to the tunnel's plain public URL
+   (`/`) for the actual test hub and work through the numbered tests from
+   there. If a "lab session code" keeps changing every time you go back to
+   the home page, that's itself useful information - it means cookies aren't
+   working.
 6. Check `/report` (or `/report/text`) at any point to see everything
    gathered so far. Since the phone can't easily save a file, note down the
    6-character session code shown at the bottom of every page - you can open
@@ -175,6 +181,7 @@ OperaLegacyLab.Web/
     _ViewStart.cshtml              Wires every page to Shared/_Layout.cshtml
     Shared/_Layout.cshtml          Page chrome: HTML 4.01 doctype, nav links, no CSS
     Index.cshtml                   /                              home page, links to every test
+    OK.cshtml                      /OK                            bare "OK" connectivity check - no layout, no session cookie (Content() bypass)
     Diagnostics.cshtml             /diagnostics                   raw request/header dump
     UaProf.cshtml                  /uaprof                        WAP UAProf (X-Wap-Profile) fetch-and-show
     Report.cshtml                  /report                        aggregated server-verified + self-reported results
@@ -199,7 +206,10 @@ OperaLegacyLab.Web/
       Wap.cshtml                    /test/wap                        info page, Accept header check
       WapWml.cshtml                 /test/wap.wml                     the actual WML 1.3 card (Content() bypass)
       WapResult.cshtml              /test/wap/result                  records the WML yes/no reply
-  wwwroot/img/                     test.gif / test.png / test.jpg
+      QrImage.cshtml                /test/qr-image                    rotating QR code, PNG image variant
+      QrTable.cshtml                 /test/qr-table                    rotating QR code, HTML table variant
+      TableVariants.cshtml           /test/table-variants              five table-cell-sizing techniques side by side, numbered 2-6 (see why below)
+  wwwroot/img/                     test.gif / test.png / test.jpg / qr-spacer.gif (1x1 transparent, spacer-GIF technique)
 ```
 
 Two things worth knowing if you're extending this:
@@ -240,3 +250,19 @@ Two things worth knowing if you're extending this:
 - This is a single-process, in-memory tool - sessions are lost when the
   process restarts. Fine for a test session; don't expect history to survive
   a redeploy or a Visual Studio rebuild-and-relaunch.
+- **A fix confirmed on one device/browser doesn't automatically hold on another, even a similarly "old"
+  one.** `/test/qr-table`'s current table-layout:fixed + colgroup + font-size:1px;line-height:1px
+  technique was confirmed square on the Nokia 9300's native Opera 6, but a Nokia 5130 running Opera Mini
+  4.5 still showed it vertically stretched. Opera Mini is architecturally not the same kind of browser as
+  Opera 6 native - it pre-renders/transcodes pages on Opera's own servers rather than laying them out on
+  the handset itself - so it can (and here, does) disagree with a fix that genuinely works on-device
+  elsewhere. `/test/table-variants` exists to narrow down a fix that (hopefully) holds on both, by putting
+  several independently-built variants on one page instead of guessing at a single new technique per
+  round trip. (The original Variant 1, "no fixes at all", was removed after it turned out to render
+  stretched even in a desktop browser - not a legacy-browser-specific finding - see TableVariants.cshtml.cs's
+  own doc comment. The remaining variants keep their original numbers, 2-6, rather than being renumbered.)
+- `DeviceResultLog`'s auto-write-to-file behavior only fires for a request whose User-Agent contains
+  "Nokia9300" (see its own doc comment) - a Nokia 5130/Opera Mini session's results still land in that
+  session's own `Lab.SelfReports` and are visible on `/report`/`/report/text` as normal, just not
+  auto-mirrored to `device-results.txt`. Check `/diagnostics` on that phone for its actual User-Agent
+  string if you want that marker extended to cover it too.

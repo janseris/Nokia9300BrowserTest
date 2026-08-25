@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+    <title>Loading</title>
+
+    <style type="text/css">
+        body {
+            margin: 0px;
+            padding-top: 80px;
+            text-align: center;
+            background-color: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .number {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 48px;
+            font-weight: bold;
+        }
+    </style>
+
+    <script type="text/javascript">
+    <!--
+
+    var target = 2781;
+    var current = 0;
+
+    function getNumber()
+    {
+        var query;
+        var p;
+        var value;
+
+        query = location.search;
+
+        if (query != null && query.length > 0)
+        {
+            p = query.indexOf("n=");
+
+            if (p >= 0)
+            {
+                value = query.substring(p + 2);
+                current = parseInt(value, 10);
+
+                if (isNaN(current))
+                {
+                    current = 0;
+                }
+            }
+        }
+    }
+
+    function nextNumber()
+    {
+        var difference;
+        var step;
+        var next;
+
+        if (current >= target)
+        {
+            return;
+        }
+
+        difference = target - current;
+
+        step = Math.ceil(difference / 10);
+
+        if (step < 50)
+        {
+            step = 50;
+        }
+
+        next = current + step;
+
+        if (next > target)
+        {
+            next = target;
+        }
+
+        window.location.href =
+            "legacy-number.html?n=" + next;
+    }
+
+    function start()
+    {
+        getNumber();
+
+        if (current < target)
+        {
+            setTimeout("nextNumber()", 500);
+        }
+    }
+
+    //-->
+    </script>
+</head>
+
+<body onload="start()">
+
+<div class="number">
+<script type="text/javascript">
+<!--
+getNumber();
+document.write(current);
+//-->
+</script>
+</div>
+
+</body>
+</html>

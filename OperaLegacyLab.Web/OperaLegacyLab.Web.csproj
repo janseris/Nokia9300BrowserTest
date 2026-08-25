@@ -6,6 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SixLabors.ImageSharp" Version="4.1.1" />
+  </ItemGroup>
+
   <!-- QRCoder's core encoder is vendored under Vendor/QRCoder (see the README.md there for why:
        no NuGet PackageReference, just its dependency-free source files) rather than referenced
        as a PackageReference - no ItemGroup needed here, the .cs files under Vendor/ are picked up

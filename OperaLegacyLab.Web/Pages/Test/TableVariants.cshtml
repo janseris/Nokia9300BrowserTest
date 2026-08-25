@@ -1,0 +1,30 @@
+@page "/test/table-variants"
+@model OperaLegacyLab.Web.Pages.Test.TableVariantsModel
+@using OperaLegacyLab.Web.Infrastructure
+@{
+    var code = Model.Lab.Code;
+}
+<h1>Table cell sizing variants test</h1>
+<p>Five small 12x12 checkerboards below (numbered 2-6 - Variant 1 was removed, it turned out to render
+stretched even in a desktop browser, so it wasn't telling us anything about old-phone rendering), each
+built with a different combination of table-sizing techniques. Each SHOULD be a square, exactly 72x72
+pixels. If a technique doesn't keep a &lt;td&gt; at its declared height, the checkerboard comes out as a
+tall thin rectangle instead - look at each one and note, in the form at the bottom, which numbers looked
+like a square and which looked stretched.</p>
+<p><font size="1">Variant 2 is the exact technique the real QR code pages (<a href="@Markup.U("/test/qr-table", code)">/test/qr-table</a>)
+already use today - if it looks stretched here too, that confirms this page is reproducing the same bug,
+not a different one.</font></p>
+
+@foreach (var (spec, html) in Model.Variants)
+{
+    <hr>
+    <h2>@spec.Label</h2>
+    <p><font size="1">@spec.Description</font></p>
+    @Html.Raw(html)
+}
+
+<hr>
+@Html.Raw(SelfReport.Form(Model.Lab.Code,
+    "Which variant numbers (2-6) looked like a correct square, and which looked stretched? Write the numbers in the notes box below (e.g. \"2,4 stretched - 3,5,6 square\")."))
+
+<p><a href="@Markup.U("/test/qr-table", code)">Back to the real QR (table) test</a></p>

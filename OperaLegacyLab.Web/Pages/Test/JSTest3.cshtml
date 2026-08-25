@@ -1,0 +1,44 @@
+﻿@page "/jstest3"
+@model OperaLegacyLab.Web.Pages.Index1Model
+@{
+}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+<head>
+    <title>JS Test</title>
+
+    <script type="text/javascript">
+                <!--
+
+            var n = 0;
+
+            function count() {
+                n = n + 1;
+
+                document.numberForm.numberField.value = n;
+
+                if (n < 2781) {
+                    setTimeout("count()", 100);
+                }
+            }
+
+            //-->
+    </script>
+</head>
+
+<body>
+
+    <form name="numberForm">
+        <input type="text" name="numberField" value="0">
+    </form>
+
+    <script type="text/javascript">
+            <!--
+            count();
+            //-->
+    </script>
+
+</body>
+</html>

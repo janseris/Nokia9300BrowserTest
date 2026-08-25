@@ -43,7 +43,7 @@ public sealed class DeviceResultLog
     {
         "html", "css", "css2", "js",
         "js_dialog_alert", "js_dialog_confirm", "js_dialog_prompt", "js2",
-        "encoding", "compression", "ssr", "frames", "qr_image", "qr_table",
+        "encoding", "compression", "ssr", "frames", "qr_image", "qr_table", "table_variants",
         "cookies", "forms", "wml", "uaprof",
         "cookies_secure",
     };

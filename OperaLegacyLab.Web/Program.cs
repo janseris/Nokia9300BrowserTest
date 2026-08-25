@@ -1,7 +1,8 @@
-using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using OperaLegacyLab.Web.Infrastructure;
+using OperaLegacyLab.Web.Services;
+using System.Net;
 
 // `dotnet watch run` (and Visual Studio's equivalent hot-reload launch) auto-injects
 // Microsoft.AspNetCore.Watch.BrowserRefresh via the ASPNETCORE_HOSTINGSTARTUPASSEMBLIES env var - it
@@ -138,5 +139,16 @@ app.UseMiddleware<PageSizeReportMiddleware>();
 // one call replaces what used to be a dozen separate app.MapXxxEndpoints()
 // registrations.
 app.MapRazorPages();
+
+
+var gifPath = Path.Combine(
+    app.Environment.WebRootPath,
+    "images",
+    "loading.gif");
+
+if (!File.Exists(gifPath))
+{
+    LoadingGifGenerator.Generate(gifPath);
+}
 
 app.Run();
